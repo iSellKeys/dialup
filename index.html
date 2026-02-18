@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DialUp CRM</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            --hot-color: #ff4b2b;
+            --warm-color: #ffb703;
+            --contract-color: #219ebc;
+            --people-color: #8338ec;
+            --bg-light: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #2d3436;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            padding: 50px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+
+        .streak-pill {
+            background: #fff0f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: var(--hot-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        h1 { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 1px; color: #ff7e5f; }
+
+        /* Main Area */
+        .feed-container {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .lead-card {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            cursor: grab;
+        }
+
+        /* Lead Card UI */
+        .stage-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .chip-hot { background: #ffe3e0; color: var(--hot-color); }
+        .chip-contract { background: #e0f2fe; color: var(--contract-color); }
+
+        .lead-name {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .lead-info { color: #636e72; font-size: 0.9rem; margin-bottom: 20px; }
+        
+        .note-box {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            min-height: 80px;
+            margin-bottom: 25px;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 18px;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .btn-call { background: var(--primary-gradient); color: white; box-shadow: 0 10px 20px rgba(255, 154, 158, 0.4); }
+        .btn-text { background: #f1f2f6; color: #2d3436; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: white;
+            height: 90px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            gap: 4px;
+        }
+
+        .nav-item.active { color: var(--hot-color); }
+        .nav-icon { font-size: 1.4rem; }
+
+        /* Contract Progress Bar */
+        .progress-container {
+            margin: 15px 0;
+            background: #eee;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: var(--contract-color);
+            height: 100%;
+            width: 65%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="streak-pill">🔥 12</div>
+        <h1>DIALUP</h1>
+        <div style="font-size: 1.5rem;">+</div>
+    </div>
+
+    <div class="feed-container" id="feed">
+        <!-- Lead Card -->
+        <div class="lead-card" id="currentCard">
+            <div id="cardContent">
+                <span class="stage-chip chip-hot">🏠 BUYER • HOT</span>
+                <div class="lead-name">JONATHAN REED</div>
+                <div class="lead-info">Zillow Lead • (555) 012-3456</div>
+                
+                <div class="note-box">
+                    Looking for a 3-bed in South Beach. Needs to move before school starts in August. Very motivated.
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-call" onclick="handleCall()">📞 CALL NOW</button>
+                    <button class="btn btn-text">💬 TEXT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="switchTab('hot')">
+            <span class="nav-icon">🔥</span>
+            <span>HOT</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('warm')">
+            <span class="nav-icon">☀️</span>
+            <span>WARM</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('contract')">
+            <span class="nav-icon">📋</span>
+            <span>CONTRACT</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('people')">
+            <span class="nav-icon">💛</span>
+            <span>PEOPLE</span>
+        </a>
+    </nav>
+
+    <script>
+        const leads = [
+            { name: "JONATHAN REED", type: "BUYER", stage: "hot", source: "Zillow", note: "Looking for a 3-bed in South Beach. Needs to move before school starts in August.", phone: "5550123456" },
+            { name: "SARAH MILLER", type: "SELLER", stage: "contract", address: "123 Ocean Dr", note: "Escrow opened. Inspection scheduled for Tuesday.", phone: "5559876543", progress: 65 }
+        ];
+
+        function switchTab(tab) {
+            // Update active UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const content = document.getElementById('cardContent');
+            
+            if (tab === 'contract') {
+                const lead = leads[1];
+                content.innerHTML = `
+                    <span class="stage-chip chip-contract">📋 IN CONTRACT</span>
+                    <div class="lead-name">${lead.name}</div>
+                    <div class="lead-info">${lead.address} • 17 Days Remaining</div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-fill" style="width: ${lead.progress}%"></div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #636e72; margin-bottom: 15px;">Milestone: Inspection Contingency (Due in 2 days)</p>
+
+                    <div class="note-box">${lead.note}</div>
+
+                    <div class="actions">
+                        <button class="btn btn-call" style="background: var(--contract-color)">VIEW DEAL DETAILS →</button>
+                    </div>
+                `;
+            } else if (tab === 'hot') {
+                const lead = leads[0];
+                content.innerHTML = `
+                    <span class="stage-chip chip-hot">🏠 BUYER • HOT</span>
+                    <div class="lead-name">${lead.name}</div>
+                    <div class="lead-info">${lead.source} Lead • ${lead.phone}</div>
+                    <div class="note-box">${lead.note}</div>
+                    <div class="actions">
+                        <button class="btn btn-call" onclick="handleCall()">📞 CALL NOW</button>
+                        <button class="btn btn-text">💬 TEXT</button>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `<div style="text-align:center; padding: 40px 0;">
+                    <h2 style="font-family: 'Bebas Neue'; color: #b2bec3;">No Leads Today</h2>
+                    <p style="color: #636e72;">Try prospecting in your farm area!</p>
+                </div>`;
+            }
+        }
+
+        function handleCall() {
+            alert("Dialing Lead... \nPoints +8 \nStreak Maintained!");
+        }
+
+        // Simple Drag simulation for "Swipe"
+        let startX;
+        const card = document.getElementById('currentCard');
+
+        card.addEventListener('mousedown', e => startX = e.pageX);
+        card.addEventListener('mouseup', e => {
+            const diff = e.pageX - startX;
+            if (Math.abs(diff) > 100) {
+                card.style.transform = `translateX(${diff > 0 ? 500 : -500}px) rotate(${diff > 0 ? 20 : -20}deg)`;
+                card.style.opacity = 0;
+                setTimeout(() => {
+                    card.style.transform = 'translateX(0) rotate(0)';
+                    card.style.opacity = 1;
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
